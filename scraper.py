@@ -19,7 +19,7 @@ class PdfScraper:
 
         pdf_content = read_pdf(self.filename, pages="all", multiple_tables=True)
 
-        for table_index, table in enumerate(pdf_content[1:]):
+        for table in pdf_content[1:]:
 
             name = self.get_table_name(table)
 
@@ -62,7 +62,7 @@ class PdfScraper:
                     for sub_item in item.split():
                         if is_int(sub_item):
                             debugged_table.append(str(int(float(sub_item))))
-                            
+
         return [debugged_table]
 
 
