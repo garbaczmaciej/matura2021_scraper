@@ -138,6 +138,6 @@ dmypy.json
 cython_debug/
 
 # CUSTOM
-data/
-sub_data/
-charts/
+data/*
+sub_data/*
+charts/*
