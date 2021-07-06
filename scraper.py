@@ -1,4 +1,5 @@
 from tabula import read_pdf
+import pandas as pd
 
 from scraper_config import Config
 
@@ -36,6 +37,9 @@ class PdfScraper:
         table_name_row = table.head(0).keys()
         for name in table_name_row:
             if "Unnamed" not in name:
+                # CHEMIA ROZSZERZON W DANYCH
+                if "rozszerzony" not in name:
+                    name.replace("rozszerzon", "rozszerzony")
                 return name
 
     def scrape_results(self, numbers_table) -> dict:
@@ -67,15 +71,35 @@ class PdfScraper:
 
 
     def save_results_to_file(self, name: str, results_list: list) -> None:
-        filepath = Config.DATA_DIR + f"/{name}.txt"
-        # CLEAR FILE
-        with open(filepath, "w") as f:
-            f.write("")
+        filepath = Config.DATA_DIR + f"/{name}.csv"
 
-        with open(filepath, "a") as f:
-            f.write(f"{name}\n")
-            for percent, percentile in results_list:
-                f.write(f"{percent},{percentile}\n")
+        percents = [line[0] for line in results_list]
+        percentiles = [line[1] for line in results_list]
+
+        df = pd.DataFrame({"Wynik":percents, "Centyl":percentiles})
+
+        with open(filepath, "w") as f:
+            f.write(df.to_csv(index=False))
+
+        sub_filepath = Config.SUBTRACTED_DATA_DIR + f"/{name}.csv"
+
+        subtracted_percentiles = [percentiles[0]]
+        for i in range(1, len(percentiles)):
+            subtracted_percentiles.append(percentiles[i] - percentiles[i-1])
+        
+        sub_df = pd.DataFrame({"Wynik":percents, "Centyl":subtracted_percentiles})
+
+        with open(sub_filepath, "w") as f:
+            f.write(sub_df.to_csv(index=False))
+
+        # # CLEAR FILE
+        # with open(filepath, "w") as f:
+        #     f.write("")
+
+        # with open(filepath, "a") as f:
+        #     f.write(f"{name}\n")
+        #     for percent, percentile in results_list:
+        #         f.write(f"{percent},{percentile}\n")
             
 
 
