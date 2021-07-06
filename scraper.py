@@ -1,7 +1,7 @@
 from tabula import read_pdf
 import pandas as pd
 
-from scraper_config import Config
+from config import Config
 
 
 def is_int(string: str) -> bool:
@@ -39,7 +39,7 @@ class PdfScraper:
             if "Unnamed" not in name:
                 # CHEMIA ROZSZERZON W DANYCH
                 if "rozszerzony" not in name:
-                    name.replace("rozszerzon", "rozszerzony")
+                    name = name.replace("rozszerzon", "rozszerzony")
                 return name
 
     def scrape_results(self, numbers_table) -> dict:
@@ -71,35 +71,34 @@ class PdfScraper:
 
 
     def save_results_to_file(self, name: str, results_list: list) -> None:
-        filepath = Config.DATA_DIR + f"/{name}.csv"
+        self.save_data(name, results_list)
+        self.save_sub_data(name, results_list)
+
+    def save_sub_data(self, name: str, results_list: list) -> None:
+        sub_filepath = Config.SUBTRACTED_DATA_DIR + f"/{name}.csv"
 
         percents = [line[0] for line in results_list]
         percentiles = [line[1] for line in results_list]
-
-        df = pd.DataFrame({"Wynik":percents, "Centyl":percentiles})
-
-        with open(filepath, "w") as f:
-            f.write(df.to_csv(index=False))
-
-        sub_filepath = Config.SUBTRACTED_DATA_DIR + f"/{name}.csv"
 
         subtracted_percentiles = [percentiles[0]]
         for i in range(1, len(percentiles)):
             subtracted_percentiles.append(percentiles[i] - percentiles[i-1])
         
-        sub_df = pd.DataFrame({"Wynik":percents, "Centyl":subtracted_percentiles})
+        sub_df = pd.DataFrame({Config.SUB_DATA_CHART_X:percents, Config.SUB_DATA_CHART_Y:subtracted_percentiles})
 
         with open(sub_filepath, "w") as f:
             f.write(sub_df.to_csv(index=False))
 
-        # # CLEAR FILE
-        # with open(filepath, "w") as f:
-        #     f.write("")
+    def save_data(self, name: str, results_list: list) -> None:
+        filepath = Config.DATA_DIR + f"/{name}.csv"
 
-        # with open(filepath, "a") as f:
-        #     f.write(f"{name}\n")
-        #     for percent, percentile in results_list:
-        #         f.write(f"{percent},{percentile}\n")
+        percents = [line[0] for line in results_list]
+        percentiles = [line[1] for line in results_list]
+
+        df = pd.DataFrame({Config.DATA_CHART_X:percents, Config.DATA_CHART_Y:percentiles})
+
+        with open(filepath, "w") as f:
+            f.write(df.to_csv(index=False))
             
 
 
