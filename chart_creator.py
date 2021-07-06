@@ -10,8 +10,9 @@ class ChartCreator:
     def __init__(self, filename: str, config: Config):
         
         self.config = config
-        self.path = f"{self.config.USED_DIR}/{filename}"
         self.filename = filename
+
+        self.path = f"{config.DATA_DIR}/{filename}"
         self.name = filename.split(".")[0]
 
 
@@ -30,7 +31,7 @@ class ChartCreator:
 
 
 def draw_charts():
-    for filename in listdir(Config.USED_DIR):
+    for filename in listdir(Config.DATA_DIR):
         chart_creator = ChartCreator(filename, Config)
         chart_creator.create_chart()
 
