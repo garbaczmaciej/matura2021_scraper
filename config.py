@@ -1,4 +1,4 @@
-from os import mkdir, path
+from os import mkdir
 
 class Config:
     # NAZWA PDFa Z TABELKAMI
@@ -10,8 +10,12 @@ class Config:
     CHART_X = "Wynik"
     CHART_Y = "Centyl"
 
-if not path.exists(Config.DATA_DIR):
+try:
     mkdir(Config.DATA_DIR)
+except FileExistsError:
+    pass
 
-if not path.exists(Config.CHART_DIR):
-    mkdir(Config.DATA_DIR)
+try:
+    mkdir(Config.CHART_DIR)
+except FileExistsError:
+    pass
